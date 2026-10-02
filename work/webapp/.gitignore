@@ -1,0 +1,5 @@
+.env
+data/bom.sqlite
+data/bom.sqlite-*
+data/projects/*
+server.log

@@ -1,0 +1,31 @@
+{
+  "project": "sample-project",
+  "cabinets": [
+    {
+      "name": "AP-SAMPLE-01",
+      "items": [
+        {
+          "category": "断路器",
+          "specification": "3P 200A",
+          "quantity": 1,
+          "source": {
+            "original_text": ["3P 200A"],
+            "coordinates": [{"layout": "Model", "x": 120.5, "y": 80.25}],
+            "recognition_rule": "pole + current pattern"
+          }
+        },
+        {
+          "category": "SPD",
+          "specification": "20KA SPD",
+          "quantity": 1,
+          "source": {
+            "original_text": ["20KA SPD"],
+            "coordinates": [{"layout": "Model", "x": 145.0, "y": 80.25}],
+            "recognition_rule": "SPD rating pattern"
+          }
+        }
+      ]
+    }
+  ],
+  "note": "Synthetic example only; no production drawing or customer data is included."
+}

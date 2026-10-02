@@ -1,0 +1,8 @@
+{
+  "name": "dwg-bom-internal-tool",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "dependencies": { "exceljs": "^4.4.0" },
+  "scripts": { "start": "node server.mjs" }
+}

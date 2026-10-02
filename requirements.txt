@@ -1,0 +1,5 @@
+# Python 3.11+ runtime dependencies used by CAD parsing and quotation PDF generation.
+# Versions are pinned so a clean environment can reproduce the validated toolchain.
+ezdxf==1.4.4
+reportlab==5.0.1
+pypdf==6.19.0

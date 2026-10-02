@@ -1,0 +1,60 @@
+# database
+*.sqlite
+*.sqlite3
+*.db
+*.db-*
+
+# environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# user data and generated project artifacts
+data/
+projects/
+organizations/
+production-backups/
+work/webapp/data/
+work/webapp/test-runs/
+outputs/
+tmp/
+*.dwg
+*.dxf
+*.pdf
+*.xlsx
+*.xls
+*.csv
+
+# logs
+*.log
+
+# dependencies
+node_modules/
+
+# externally installed CAD converter (not distributed by this repository)
+work/libredwg/
+
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# generated reports and previews
+report.json
+*_report.json
+*_preview.png
+*.svg
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# editors
+.vscode/
+.idea/

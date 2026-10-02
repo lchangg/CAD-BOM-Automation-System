@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#12304a"><title>配电系统 BOM 工作台</title><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/styles.css"></head>
+<body>
+  <header class="topbar"><div class="brand-mark">P</div><div><div class="eyebrow">内部工具 / CAD 解析工作台</div><h1>配电系统 BOM</h1></div><div class="topbar-meta" id="headerStatus">未登录</div><button class="topbar-logout hidden" id="logoutButton">退出登录</button></header>
+  <section id="loginState" class="login-state"><form id="loginForm" class="login-card"><div class="eyebrow">生产环境</div><h2>登录 BOM 工作台</h2><p>登录后才能访问项目历史和图纸数据。</p><label>邮箱<input id="loginEmail" type="email" autocomplete="username" required></label><label>密码<input id="loginPassword" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">登录</button><div id="loginError" class="login-error hidden"></div></form></section>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="module-nav"><button class="module-nav-button active" id="projectsNav">BOM 项目</button><button class="module-nav-button" id="masterNav">基础资料</button></div>
+      <div class="side-title"><span>项目历史</span><button class="icon-button" id="newProjectButton" title="新建项目">＋</button></div>
+      <form class="new-project-form hidden" id="newProjectForm"><input id="projectNameInput" placeholder="项目名称" required><button class="primary compact">创建</button></form>
+      <div id="projectList" class="project-list"></div>
+      <div class="side-note">项目数据保存在当前解析机。DWG 上传后沿用既有 LibreDWG + Python 规则流程。</div>
+    </aside>
+    <section class="workspace">
+      <div id="projectModule">
+        <div id="emptyState" class="empty-state"><div class="empty-icon">⌁</div><h2>选择一个项目开始</h2><p>新建项目后上传 DWG，系统会自动生成柜体 BOM，并保留原始文字、坐标与识别规则。</p><button class="primary" id="emptyNewButton">新建项目</button></div>
+        <div id="projectView" class="hidden">
+        <section class="project-head"><div><div class="eyebrow">当前项目</div><h2 id="projectTitle"></h2><div class="project-meta" id="projectMeta"></div></div><div class="project-actions"><label class="upload-button"><input type="file" id="dwgInput" accept=".dwg">上传 DWG</label><button class="secondary" id="applyProjectRulesButton">应用本项目全部已确认规则</button><button class="secondary" id="quotationButton">报价计算</button><button class="secondary" id="exportButton">导出 Excel</button></div></section>
+        <div id="notice" class="notice hidden"></div>
+        <div class="stats" id="stats"></div>
+        <section class="review-card"><div class="review-toolbar"><div><h3>BOM 审核</h3><p>可直接修改类别、规格、数量和状态；删除或添加材料后点击保存。</p></div><div class="toolbar-actions"><button class="secondary" id="addRowButton">添加材料</button><button class="primary" id="saveButton">保存修改</button></div></div>
+          <div id="addForm" class="add-form hidden"></div>
+          <div class="table-wrap"><table><thead><tr><th>柜体</th><th>材料类别</th><th>规格</th><th>数量</th><th>品牌</th><th>型号</th><th>采购价格</th><th>匹配状态</th><th>审核状态</th><th>原始文字</th><th>来源坐标</th><th>识别规则</th><th>操作</th></tr></thead><tbody id="bomBody"></tbody></table></div>
+          <div id="noBom" class="no-bom hidden">还没有 BOM。请先上传 DWG。</div>
+        </section>
+        </div>
+        <div id="quotationView" class="hidden">
+          <section class="project-head"><div><div class="eyebrow">项目报价</div><h2 id="quotationTitle"></h2><div class="project-meta">报价基于当前 BOM 的已匹配采购价格计算；未匹配价格的材料成本按 0 计入并单独提示。</div></div><button class="secondary" id="backToBomButton">返回 BOM 审核</button></section>
+          <div id="quotationNotice" class="notice hidden"></div>
+          <div class="quotation-grid" id="quotationSummary"></div>
+          <section class="review-card quotation-card"><div class="review-toolbar"><div><h3>费用与利润</h3><p>人工费、运输费、其他费用和利润率只作用于当前项目报价。</p></div><button class="primary" id="saveQuotationButton">保存报价</button></div><div class="quotation-fees"><label>人工费<input id="laborFeeInput" type="number" min="0" step="0.01"></label><label>运输费<input id="transportFeeInput" type="number" min="0" step="0.01"></label><label>其他费用<input id="otherFeeInput" type="number" min="0" step="0.01"></label><label>利润率（%）<input id="profitRateInput" type="number" min="0" step="0.01"></label></div>
+            <div class="table-wrap quotation-table-wrap"><table><thead><tr><th>柜体</th><th>材料类别</th><th>规格</th><th>数量</th><th>品牌</th><th>型号</th><th>单价</th><th>材料成本</th><th>价格状态</th></tr></thead><tbody id="quotationBody"></tbody></table></div>
+          </section>
+          <section class="review-card pdf-card"><div class="review-toolbar"><div><h3>客户报价 PDF</h3><p>填写客户信息后生成一份报价 PDF；每次生成都会保存为一条历史报价。</p></div><button class="primary" id="generatePdfButton">生成客户报价 PDF</button></div><div class="customer-form"><label>客户名称<input id="customerNameInput" placeholder="例如：某某科技有限公司"></label><label>联系人<input id="customerContactInput"></label><label>联系电话<input id="customerPhoneInput"></label><label>客户地址<input id="customerAddressInput"></label><label class="wide">备注<textarea id="customerNotesInput" rows="2"></textarea></label></div><div class="pdf-history"><div class="history-title">历史报价</div><div id="pdfHistoryList" class="history-list"></div></div></section>
+        </div>
+      </div>
+      <div id="masterModule" class="hidden">
+        <section class="project-head"><div><div class="eyebrow">V1.2 基础资料</div><h2>基础资料管理</h2><div class="project-meta">公共产品资料由平台维护；供应商和价格属于当前企业。</div></div><div class="project-actions"><button class="secondary" id="supplierImportButton">供应商价格导入</button><button class="secondary" id="downloadImportTemplate">下载导入模板.xlsx</button><label class="secondary import-file-button" id="masterImportLabel"><input type="file" id="masterImportFile" accept=".xlsx,.csv">批量导入</label><button class="primary" id="masterAddButton">新增记录</button></div></section>
+        <div id="masterNotice" class="notice hidden"></div>
+        <div class="master-tab-sections"><section><div class="master-section-title">公共产品资料</div><div class="master-tabs" id="masterPublicTabs"></div></section><section><div class="master-section-title">我的采购资料</div><div class="master-tabs" id="masterPrivateTabs"><button class="master-tab" id="replacementRulesTab">我的匹配规则</button></div></section></div>
+        <section class="review-card master-card"><div class="review-toolbar"><div><h3 id="masterTitle">材料库</h3><p id="masterDescription">材料基础信息和计量单位。</p></div><div class="master-count" id="masterCount"></div></div>
+          <div id="masterForm" class="master-form hidden"></div>
+          <div class="table-wrap master-table-wrap"><table><thead id="masterHead"></thead><tbody id="masterBody"></tbody></table></div>
+          <div id="masterEmpty" class="no-bom hidden">还没有记录，请新增一条基础资料。</div>
+        </section>
+        <section class="review-card master-card hidden" id="replacementRulesCard"><div class="review-toolbar"><div><h3>我的匹配规则</h3><p>仅显示当前企业创建的材料/规格默认品牌与产品匹配规则。</p></div><div><span class="master-count" id="replacementRulesCount"></span><button class="primary compact" id="addReplacementRuleButton">新增规则</button></div></div><div id="replacementRuleForm" class="master-form hidden"></div><div class="table-wrap master-table-wrap"><table><thead><tr><th>来源材料</th><th>来源规格</th><th>目标品牌</th><th>目标型号</th><th>本企业价格</th><th>状态</th><th>优先级</th><th>备注</th><th>操作</th></tr></thead><tbody id="replacementRulesBody"></tbody></table></div><div id="replacementRulesEmpty" class="no-bom hidden">还没有匹配规则。可在 BOM 品牌匹配确认时保存规则。</div></section>
+      </div>
+    </section>
+  </main>
+  <div id="brandDrawerBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="brandDrawer" class="brand-drawer hidden" aria-label="品牌型号匹配">
+    <div class="drawer-head"><div><div class="eyebrow">采购资料匹配</div><h2>选择品牌与型号</h2></div><button class="icon-button" id="closeBrandDrawer" title="关闭">×</button></div>
+    <div id="brandDrawerNotice" class="notice hidden"></div>
+    <div id="replacementRecommendation" class="replacement-recommendation hidden"></div>
+    <div id="brandDrawerBody"></div>
+    <label class="save-replacement-rule-option"><input type="checkbox" id="saveReplacementRuleOption">保存为本企业此材料/规格的默认匹配</label>
+  </aside>
+  <div id="importDrawerBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="importDrawer" class="import-drawer hidden" aria-label="基础资料批量导入预览">
+    <div class="drawer-head"><div><div class="eyebrow">基础资料模块</div><h2>批量导入预览</h2></div><button class="icon-button" id="closeImportDrawer" title="关闭">×</button></div>
+    <div id="importNotice" class="notice hidden"></div>
+    <div id="importSummary" class="import-summary"></div>
+    <div class="import-file-name" id="importFileName"></div>
+    <div class="import-preview-table"><table><thead><tr><th>行号</th><th>类型</th><th>状态</th><th>原因</th><th>关键字段</th></tr></thead><tbody id="importPreviewBody"></tbody></table></div>
+    <div class="drawer-actions"><button class="secondary" id="cancelImport">取消</button><button class="primary" id="confirmImport" disabled>确认导入有效记录</button></div>
+  </aside>
+  <div id="supplierImportBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="supplierImportDrawer" class="import-drawer hidden" aria-label="供应商价格导入">
+    <div class="drawer-head"><div><div class="eyebrow">企业采购资料</div><h2>供应商价格导入</h2></div><button class="icon-button" id="closeSupplierImport" title="关闭">×</button></div>
+    <div id="supplierImportNotice" class="notice hidden"></div>
+    <div class="supplier-import-controls"><label>选择供应商<select id="supplierImportSupplier"></select></label><label>上传原始 Excel / CSV<input type="file" id="supplierImportFile" accept=".xlsx,.csv"></label></div>
+    <div id="supplierImportMapping" class="hidden"></div>
+    <div id="supplierImportPreview" class="hidden"></div>
+    <div class="drawer-actions"><button class="secondary" id="cancelSupplierImport">取消</button><button class="primary" id="previewSupplierImport" disabled>预览导入影响</button><button class="primary hidden" id="confirmSupplierImport">确认写入价格库</button></div>
+  </aside>
+  <script src="/app.js"></script>
+</body>
+</html>
